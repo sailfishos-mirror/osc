@@ -68,24 +68,3 @@ class GitUtilities:
             raise ValueError("Either 'pr_number' or 'branch' must be specified")
 
         return git
-
-    @staticmethod
-    def is_submodule(git, repo_path: str, submodule_path: str) -> str:
-        """
-        Checks if a directory is a registered Git submodule.
-
-        Args:
-            git: An instance of the Git class representing the repository.
-            repo_path: The absolute path to the main repository.
-            submodule_path: The relative path to the submodule from the repo root.
-
-        Returns:
-            True if the path is a registered submodule, False otherwise.
-        """
-        # Ensure the provided path exists and is a directory
-        if not os.path.isdir(os.path.join(repo_path, submodule_path)):
-            print(f"  Path '{submodule_path}' does not exist or is not a directory.")
-            return None
-
-
-        return git.submodule_status(submodule_path)
