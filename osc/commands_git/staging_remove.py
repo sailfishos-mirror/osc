@@ -3,7 +3,6 @@ import osc.commandline_git
 import re
 from typing import List, Tuple, Optional
 import os
-from osc.gitea_api.utilities.git_utilities import GitUtilities as git_utilities
 from osc import gitea_api
 from osc.output import tty
 
@@ -77,12 +76,14 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
         clone_dir = os.path.join(workdir, f"{grouped_pr_obj.base_owner}_{grouped_pr_obj.base_repo}_{grouped_pr_obj.base_branch}")
         print(f"Using working directory: {clone_dir}")
-        git_utilities.clone_or_update(self.gitea_conn,
-                                      grouped_pr_obj.base_owner,
-                                      grouped_pr_obj.base_repo,
-                                      branch=grouped_pr_obj.base_branch,
-                                      directory=clone_dir,
-                                      remote="origin")
+        gitea_api.Repo.clone_or_update(
+            self.gitea_conn,
+            grouped_pr_obj.base_owner,
+            grouped_pr_obj.base_repo,
+            branch=grouped_pr_obj.base_branch,
+            directory=clone_dir,
+            remote="origin",
+        )
 
         git = gitea_api.Git(clone_dir)
         git.reset(hard=True)

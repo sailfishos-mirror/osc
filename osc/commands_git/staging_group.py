@@ -6,7 +6,6 @@ from typing import List, Tuple
 import osc.commandline_git
 from osc import gitea_api
 from osc.output import tty
-from osc.gitea_api.utilities.git_utilities import GitUtilities as git_utilities
 
 # Assuming these are defined at the top of your file
 BACKLOG_LABEL = "staging_backlog"
@@ -113,13 +112,14 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
         print(f"Using working directory: {clone_dir}")
 
         # Assuming a utility function exists for this
-        git_utilities.clone_or_update(self.gitea_conn,
-                                      context['base_owner'],
-                                      context['base_repo'],
-                                      branch=context['base_branch'],
-                                      directory=clone_dir,
-                                      remote="origin"
-                                    )
+        gitea_api.Repo.clone_or_update(
+            self.gitea_conn,
+            context["base_owner"],
+            context["base_repo"],
+            branch=context["base_branch"],
+            directory=clone_dir,
+            remote="origin",
+        )
 
         return gitea_api.Git(clone_dir), clone_dir
 
