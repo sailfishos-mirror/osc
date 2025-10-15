@@ -199,6 +199,7 @@ class Repo(GiteaModel):
 
     @classmethod
     def clone_or_update(
+        cls,
         conn: Connection,
         owner: str,
         repo: str,
