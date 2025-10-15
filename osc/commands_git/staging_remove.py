@@ -1,13 +1,14 @@
-import sys
-import osc.commandline_git
-import re
-from typing import List, Tuple, Optional
 import os
-from osc import gitea_api
-from osc.output import tty
+import re
+import sys
+from typing import List, Tuple, Optional
+
+import osc.commandline_git
+
 
 BACKLOG_LABEL = "staging_backlog"
 INPROGRESS_LABEL = "staging_inprogress"
+
 
 class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
     """
@@ -26,6 +27,8 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
     def _parse_grouped_pr(self, grouped_pr_identifier: str) -> dict:
         """Fetches and parses the grouped PR to build context and mappings."""
+        from osc import gitea_api
+        from osc.output import tty
 
         context = {
             "grouped_pr_obj": None,
@@ -57,6 +60,7 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
     def _determine_prs_to_remove(self, pr_list: list, context: dict) -> List[Tuple[str, str, int]]:
         """Resolves user input to a unique list of forwarded PRs to remove."""
+        from osc.output import tty
 
         fwd_prs_to_remove = set()
         for pr_tuple in pr_list:
@@ -73,6 +77,7 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
     def _prepare_workspace(self, workdir: str, grouped_pr_obj) -> 'gitea_api.Git':
         """Clones the repository and checks out the correct branch."""
+        from osc import gitea_api
 
         clone_dir = os.path.join(workdir, f"{grouped_pr_obj.base_owner}_{grouped_pr_obj.base_repo}_{grouped_pr_obj.base_branch}")
         print(f"Using working directory: {clone_dir}")
@@ -92,6 +97,9 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
     def _remove_submodules(self, git: 'gitea_api.Git', fwd_prs_to_remove: list, context: dict, force: Optional[bool] = False, fork: Optional[str] = None):
         """Removes submodules, commits the changes, and pushes to the remote."""
+        from osc import gitea_api
+        from osc.output import tty
+
         grouped_pr_obj = context["grouped_pr_obj"]
 
         remote = "origin"
@@ -132,6 +140,7 @@ class StagingRemoveCommand(osc.commandline_git.GitObsCommand):
 
     def _update_gitea_state(self, fwd_prs_to_remove: list, context: dict):
         """Reopens removed PRs and updates the grouped PR's description."""
+        from osc import gitea_api
 
         grouped_pr_obj = context["grouped_pr_obj"]
 

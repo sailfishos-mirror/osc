@@ -1,15 +1,19 @@
-import sys
 import os
 import re
+import sys
+import typing
 from typing import List, Tuple
 
 import osc.commandline_git
-from osc import gitea_api
-from osc.output import tty
+
+if typing.TYPE_CHECKING:
+    from osc import gitea_api
+
 
 # Assuming these are defined at the top of your file
 BACKLOG_LABEL = "staging_backlog"
 INPROGRESS_LABEL = "staging_inprogress"
+
 
 class StagingGroupCommand(osc.commandline_git.GitObsCommand):
     """
@@ -31,6 +35,9 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
 
     def _initialize_pr_processing(self, args) -> dict:
         """Handles initial PR argument parsing for new or existing grouped PRs."""
+        from osc import gitea_api
+        from osc.output import tty
+
         context = {
             "all_pkg_prs": [],
             "prj_pkg_prs": [],
@@ -69,6 +76,9 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
 
     def _process_forwarded_prs(self, args, context: dict) -> List[str]:
         """Processes the list of forwarded PRs, validates them, and updates the context."""
+        from osc import gitea_api
+        from osc.output import tty
+
         failed_entries = []
         for owner, repo, pull in args.pr_list:
             try:
@@ -102,8 +112,11 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
                 raise
         return failed_entries
 
-    def _prepare_workspace(self, args, context: dict) -> Tuple[gitea_api.Git, str]:
+    def _prepare_workspace(self, args, context: dict) -> Tuple["gitea_api.Git", str]:
         """Clones or updates the repository and returns the Git object and clone path."""
+        from osc import gitea_api
+        from osc.output import tty
+
         if not os.path.exists(args.workdir):
             print(f"{tty.colorize('ERROR', 'red,bold')}: Working directory '{args.workdir}' does not exist.", file=sys.stderr)
             sys.exit(1)
@@ -123,8 +136,11 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
 
         return gitea_api.Git(clone_dir), clone_dir
 
-    def _apply_submodule_changes(self, git: gitea_api.Git, clone_dir: str, all_pkg_prs: list) -> List[str]:
+    def _apply_submodule_changes(self, git: "gitea_api.Git", clone_dir: str, all_pkg_prs: list) -> List[str]:
         """Iterates through package PRs and applies changes to the submodules."""
+        from osc import gitea_api
+        from osc.output import tty
+
         failed_entries = []
         for owner, repo, pull in all_pkg_prs:
             try:
@@ -150,8 +166,11 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
                 raise
         return failed_entries
 
-    def _commit_and_manage_pr(self, args, git: gitea_api.Git, context: dict):
+    def _commit_and_manage_pr(self, args, git: "gitea_api.Git", context: dict):
         """Commits changes and creates a new PR or updates an existing one."""
+        from osc import gitea_api
+        from osc.output import tty
+
         repos_to_add = [repo for _, repo, _ in context["all_pkg_prs"]]
         git.add(repos_to_add)
 
@@ -235,6 +254,9 @@ class StagingGroupCommand(osc.commandline_git.GitObsCommand):
 
     def _finalize_prs(self, args, failed_entries: list):
         """Closes original PRs and reports any failures."""
+        from osc import gitea_api
+        from osc.output import tty
+
         for owner, repo, pull in args.pr_list:
             try:
                 gitea_api.PullRequest.close(self.gitea_conn, owner, repo, int(pull))
