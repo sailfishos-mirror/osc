@@ -511,6 +511,15 @@ class Options(OscOptions):
         ),
     )  # type: ignore[assignment]
 
+    apisrv: Optional[str] = Field(
+            default=None,
+            description=textwrap.dedent(
+                """
+                Deprecated option. Use apiurl instead.
+                """
+            ),
+        )  # type: ignore[assignment]
+
     section_auth: str = Field(
         default="Authentication options",
         exclude=True,

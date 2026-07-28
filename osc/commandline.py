@@ -192,6 +192,9 @@ class OscMainCommand(MainCommand):
         if conf.config["show_download_progress"]:
             self.download_progress = create_text_meter()
 
+        if conf.config["apisrv"]:
+            raise oscerr.ConfigError("apisrv in config is deprecated, use apiurl instead", "")
+
         if not args.apiurl:
             self.parser.error("Could not determine apiurl, use -A/--apiurl to specify one")
 
