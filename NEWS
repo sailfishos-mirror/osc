@@ -1,3 +1,12 @@
+- 1.27.3
+  - Command-line:
+    - Fix 'osc lbl' to work with git based packages
+  - Library:
+    - Fix gitea api IssueTimelineEntry parsing by skipping None values
+    - Fix store.get_store() to work better with check=False
+    - Fix gitea exception init (MovedPermanently)
+    - Add a few type hints
+
 - 1.27.2
   - Command-line:
     - Extend 'osc maintained' to also display maintained branches in git
