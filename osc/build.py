@@ -614,6 +614,14 @@ def get_repo(path):
 
 
 def get_prefer_pkgs(dirs, wanted_arch, type, cpio):
+    """
+    Gather all packages from directories specified via -p/--prefer-pkgs
+    to make them available in the build environment.
+
+    We're gathering all known package types, because they can be used
+    for building both packages and containers and we don't know
+    what's going to be used in the build recipe in the end.
+    """
     paths = []
     repositories = []
 
@@ -623,11 +631,7 @@ def get_prefer_pkgs(dirs, wanted_arch, type, cpio):
         if repository:
             repositories.append(repository)
         else:
-            # we don't know binary type as we haven't received buildconfig yet
-            # that's why we add all files for any matching build types
             for build_type in BUILD_TYPES:
-                if build_type.name != type:
-                    continue
                 for pattern in build_type.prefer_packages_paths:
                     for pkg_path in glob.glob(os.path.join(os.path.abspath(pkgs_dir), pattern), recursive=True):
                         use_package = True
